@@ -671,6 +671,7 @@
           <div style="display:flex;gap:8px" class="admin-block">
             <button class="btn-lancar" onclick="abrirModalAgente('${ag.id}')">Editar</button>
             <button class="btn-lancar" onclick="abrirModalLancar('${ag.id}')">Lançar</button>
+            <button class="btn-lancar" style="border-color:var(--red);color:var(--red)" onclick="excluirAgente('${ag.id}')">Excluir</button>
           </div>
         </div>
       `;
@@ -854,6 +855,14 @@
         alert('Senha incorreta.');
       }
     }
+  }
+
+  async function excluirAgente(id) {
+    const ag = agentes.find(a => a.id === id);
+    if (!confirm(`Excluir ${ag.nome}? Esta ação não pode ser desfeita.`)) return;
+    agentes = agentes.filter(a => a.id !== id);
+    await persistir();
+    render();
   }
 
   async function excluirMes() {
