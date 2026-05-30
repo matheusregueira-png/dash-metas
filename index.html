@@ -354,6 +354,7 @@
       <span id="mes-label" style="color:white;font-weight:700;font-size:0.95rem;min-width:130px;text-align:center;">—</span>
       <button id="btn-mes-next" class="btn-nav" onclick="mesSeguinte()">&#8250;</button>
     </div>
+    <button class="btn btn-outline admin-only" onclick="excluirMes()">Excluir Mês</button>
     <button class="btn btn-outline admin-only" onclick="novoMes()">Novo Mês</button>
     <button class="btn btn-outline admin-only" onclick="abrirModalAgente(null)">+ Agente</button>
     <button class="btn btn-white admin-only" onclick="abrirModalLancar(null)">Lançar Realizado</button>
@@ -853,6 +854,22 @@
         alert('Senha incorreta.');
       }
     }
+  }
+
+  async function excluirMes() {
+    if (mesesDisponiveis.length <= 1) {
+      alert('Não é possível excluir o único mês disponível.'); return;
+    }
+    const [ano, mes] = mesAtual.split('_').map(Number);
+    const label = `${['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][mes-1]} ${ano}`;
+    if (!confirm(`Excluir ${label} permanentemente? Todos os dados deste mês serão apagados.`)) return;
+    await Promise.all([
+      sb.from('dados').delete().eq('id', `mes_${mesAtual}_agentes`),
+      sb.from('dados').delete().eq('id', `mes_${mesAtual}_logistica`),
+    ]);
+    const idx = mesesDisponiveis.indexOf(mesAtual);
+    mesesDisponiveis.splice(idx, 1);
+    await carregarMes(mesesDisponiveis[Math.max(0, idx - 1)]);
   }
 
   async function novoMes() {
